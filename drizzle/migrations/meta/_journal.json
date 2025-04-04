@@ -1,0 +1,34 @@
+{
+  "version": "7",
+  "dialect": "mysql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "5",
+      "when": 1743579720199,
+      "tag": "0000_magical_brother_voodoo",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1743618165447,
+      "tag": "0001_real_selene",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1743623966604,
+      "tag": "0002_mute_mercury",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "5",
+      "when": 1743781049338,
+      "tag": "0003_dizzy_veda",
+      "breakpoints": true
+    }
+  ]
+}
