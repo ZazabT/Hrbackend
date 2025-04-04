@@ -8,12 +8,16 @@ import leavesRoute  from './routes/leavesRouts.js';
 import candidatesRoutes  from './routes/candidatesRoutes.js';
 import authRoute  from './routes/authRoute.js';
 import cors from 'cors';
-
+import dotenv from 'dotenv';
 // Initialize Express application
 const app = express();
 
 
-const port = 3000;
+// Load environment variables from .env file
+dotenv.config();
+
+// Use environment variable for port, with 3000 as fallback
+const port = process.env.PORT || 3000;
 
 // Middlewares
 app.use(express.json());
