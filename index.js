@@ -9,6 +9,8 @@ import candidatesRoutes  from './routes/candidatesRoutes.js';
 import authRoute  from './routes/authRoute.js';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import helmet from 'helmet';
+import cookieParser from 'cookie-parser';
 // Initialize Express application
 const app = express();
 
@@ -22,6 +24,8 @@ const port = process.env.PORT || 3000;
 // Middlewares
 app.use(express.json());
 app.use(cors());
+app.use(helmet());
+app.use(cookieParser());
 
 
 // Routes 
