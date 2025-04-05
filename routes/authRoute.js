@@ -1,5 +1,6 @@
 import express from 'express';
 import {login , logout ,register } from '../controllers/authController.js';
+import {verifyToken} from '../middleware/authMiddlewate.js'
 
 const route = express.Router();
 
@@ -10,7 +11,7 @@ route.get('/login' ,login);
 route.get('/register' ,register);
 
 // Logout Route
-route.get('/logout' ,logout);
+route.get('/logout' ,logout , verifyToken);
 
 
 
