@@ -21,6 +21,8 @@ const refreashExpire = process.env.JWT_REFRESH_TOKEN_EXPIRE;
 // REFRESH TOKEN CONTROLLER
 export  const refreshAccessToken = async (req, res) => {
   
+    // register function called
+    console.log('register function called');
     // Get Refresh token from cookie
     const { refreshToken } = req.cookies;
 
@@ -52,7 +54,7 @@ export const login = async (req , res )=>{
     // try to login 
     try {
         // Validate 
-        const {error , value} = loginSchema.validateAsync({email , password});
+        const {error , value} =await loginSchema.validateAsync({email , password});
 
         // check error 
 
@@ -61,7 +63,7 @@ export const login = async (req , res )=>{
         }
 
         // Check if user exists 
-        const user = await db.select().from('users').where(eq(users.email . email)).limit(1);
+        const user = await db.select().from(users).where(eq(users.email ,email));
 
         if (!user.length) {
             return res.status(404).json({ message: 'User not found' });
@@ -98,46 +100,54 @@ export const login = async (req , res )=>{
 
 
 // REGISTER CONTROLLER
-export const register = async (req , res )=>{
+export const register = async (req, res) => {
+    const { name, email, password } = req.body;
 
-    // Get register data
-    const {name, email, password} = req.body;
-
-    // Try to register 
     try {
-         // validate 
-    const {error , value} =  registerSchema.validateAsync({name , email , password});
-    // check if error
-    if(error){
-        return res.status(422).json({error :error.details[0].message});;
-    }
-    // check if there is user with this email
-    const existEmail = await db.select().from('users').where(eq(users.email , email));
+        // Validate
+        const { error, value } = await registerSchema.validateAsync({ name, email, password });
+        
+        if (error) {
+            return res.status(422).json({ error: error.details[0].message });
+        }
 
-    if(existEmail){
-        return res.status(409).json({message : "Email alrady in use"});
-    }
-    
-    // Hash the password
-    const saltRounds = 10; 
-    const hashedPassword = await bcrypt.hash(password, saltRounds);
+        // Check if email exists
+        const existEmail = await db.select().from(users).where(eq(users.email, email));
+        if (existEmail.length) { // Fix: Check length, not truthiness
+            return res.status(409).json({ message: "Email already in use" });
+        }
 
-    // Insert new user with hashed password
-    const newUser = await db.insert(users).values({ email, password: hashedPassword, name }).returning();
-    
-    res.status(201).json({ message: 'User registered', user: newUser[0] });
+        // Hash the password
+        const saltRounds = 10;
+        const hashedPassword = await bcrypt.hash(password, saltRounds);
 
+        // Insert new user (without .returning())
+        await db.insert(users).values({ email, password: hashedPassword, name });
+
+        // Fetch the newly inserted user by email (since id is auto-incremented)
+        const newUser = await db.select({ id: users.id, email: users.email, name: users.name })
+            .from(users)
+            .where(eq(users.email, email));
+
+        res.status(201).json({ message: 'User registered', user: newUser[0] });
     } catch (error) {
-        // Return 500 status code and error message
-        res.status(500).json({error: error.message});
+        console.error(error); // Log for debugging
+        res.status(500).json({ error: error.message });
     }
-}
+};
 
 
 // LOGOUT CONTROLLER
 export const logout = async (req , res )=>{
 
-    
+    // Clear the refresh token from the cookies
+    res.clearCookie('refreshToken', {
+        httpOnly: true,
+        secure: process.env.NODE_ENV !== 'production',
+        sameSite: 'Strict',
+    });
+
+    res.status(200).json({ message: 'Logged out successfully' });
 }
 
 
